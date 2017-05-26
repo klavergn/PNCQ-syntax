@@ -1,0 +1,178 @@
+* Encoding: UTF-8.
+*Recoding base variable - did you receive service?
+
+recode c1a_1 c1a_2 c1a_3 c1a_4 c1a_5 c1a_6 c1a_7 (2 = 1) (1 = 2) (0=3).
+frequencies c1a_1 c1a_2 c1a_3 c1a_4 c1a_5 c1a_6 c1a_7.
+
+*Recoding base variable - did you get enough service?
+
+frequencies c1b_1 c1b_2 c1b_3 c1b_4 c1b_5 c1b_6 c1b_7.
+
+recode c1b_1 c1b_2 c1b_3 c1b_4 c1b_5 c1b_6 c1b_7 (0=2) (1=1). 
+frequencies c1b_1 c1b_2 c1b_3 c1b_4 c1b_5 c1b_6 c1b_7.
+
+*Computing No Need column
+
+IF (c1a_1 = 1) noneed1 = 1. 
+IF (c1a_2 = 1) noneed2 = 1.
+IF (c1a_3 = 1) noneed3 = 1. 
+IF (c1a_4 = 1) noneed4 = 1. 
+IF (c1a_5 = 1) noneed5 = 1. 
+IF (c1a_6 = 1) noneed6 = 1. 
+IF (c1a_7 = 1) noneed7 = 1. 
+ 
+IF (c1a_1 = 2) noneed1 = 1. 
+IF (c1a_2 = 2) noneed2 = 1. 
+IF (c1a_3 = 2) noneed3 = 1. 
+IF (c1a_4 = 2) noneed4 = 1. 
+IF (c1a_5 = 2) noneed5 = 1. 
+IF (c1a_6 = 2) noneed6 = 1. 
+IF (c1a_7 = 2) noneed7 = 1. 
+ 
+IF (c1a_1 = 3) noneed1 = 2. 
+IF (c1a_2 = 3) noneed2 = 2. 
+IF (c1a_3 = 3) noneed3 = 2. 
+IF (c1a_4 = 3) noneed4 = 2. 
+IF (c1a_5 = 3) noneed5 = 2.
+IF (c1a_6 = 3) noneed6 = 2. 
+IF (c1a_7 = 3) noneed7 = 2. 
+exe.
+frequencies noneed1 to noneed7.
+
+*Computing Not Met column
+
+IF (c1a_1 = 1) notmet1 = 1. 
+IF (c1a_2 = 1) notmet2 = 1.
+IF (c1a_3 = 1) notmet3 = 1. 
+IF (c1a_4 = 1) notmet4 = 1. 
+IF (c1a_5 = 1) notmet5 = 1. 
+IF (c1a_6 = 1) notmet6 = 1. 
+IF (c1a_7 = 1) notmet7 = 1. 
+ 
+IF (c1a_1 = 2) notmet1 = 2. 
+IF (c1a_2 = 2) notmet2 = 2. 
+IF (c1a_3 = 2) notmet3 = 2. 
+IF (c1a_4 = 2) notmet4 = 2. 
+IF (c1a_5 = 2) notmet5 = 2. 
+IF (c1a_6 = 2) notmet6 = 2. 
+IF (c1a_7 = 2) notmet7 = 2. 
+ 
+IF (c1a_1 = 3) notmet1 = 1. 
+IF (c1a_2 = 3) notmet2 = 1. 
+IF (c1a_3 = 3) notmet3 = 1. 
+IF (c1a_4 = 3) notmet4 = 1. 
+IF (c1a_5 = 3) notmet5 = 1.
+IF (c1a_6 = 3) notmet6 = 1. 
+IF (c1a_7 = 3) notmet7 = 1. 
+
+frequencies notmet1 to notmet7.
+
+*Computing partially met column
+
+Compute  partiallymet1 = (c1a_1 = 1) & (c1b_1 = 2).
+Compute  partiallymet2 = (c1a_2 = 1) & (c1b_2 = 2).
+Compute  partiallymet3 = (c1a_3 = 1) & (c1b_3 = 2).
+Compute  partiallymet4 = (c1a_4 = 1) & (c1b_4 = 2).
+Compute  partiallymet5 = (c1a_5 = 1) & (c1b_5 = 2).
+Compute  partiallymet6 = (c1a_6 = 1) & (c1b_6 = 2).
+Compute  partiallymet7 = (c1a_7 = 1) & (c1b_7 = 2).
+
+frequencies partiallymet1 to partiallymet7.
+
+RECODE partiallymet1 to partiallymet7 (0=1) (1=2) (SYSMIS = 1).
+frequencies partiallymet1 to partiallymet7.
+
+ *Computing fully met column
+
+Compute  met1 = (c1a_1 = 1) & (c1b_1 = 1).
+Compute  met2 = (c1a_2 = 1) & (c1b_2 = 1).
+Compute  met3 = (c1a_3 = 1) & (c1b_3 = 1).
+Compute  met4 = (c1a_4 = 1) & (c1b_4 = 1).
+Compute  met5 = (c1a_5 = 1) & (c1b_5 = 1).
+Compute  met6 = (c1a_6 = 1) & (c1b_6 = 1).
+Compute  met7 = (c1a_7 = 1) & (c1b_7 = 1).
+frequencies met1 to met7.
+
+
+RECODE met1 to met7 (0=1) (1=2) (SYSMIS = 1).
+frequencies met1 to met7.
+
+*Computing no need, unserved, underserved, fully met across all services
+
+COMPUTE partial_total = mean.1(partiallymet1 to partiallymet7) > 1.
+IF mean.1(notmet1 to notmet7) > 1 AND partial_total = 0 partial_total = mean.1(met1 to met7) >1.
+COMPUTE notmet_total = 0.
+IF mean.1(notmet1 to notmet7) > 1 AND partial_total = 0 notmet_total = 1.
+COMPUTE full_total = 0.
+IF partial_total NE 1 AND notmet_total NE 1 full_total = mean.1(met1 to met7)>1.
+COMPUTE noneed_total = 0.
+IF partial_total = 0 AND notmet_total = 0 AND full_total = 0 noneed_total = 1.
+
+*Computing Any Perceived Need column
+
+IF (c1a_1 = 1) pn1 = 2. 
+IF (c1a_2 = 1) pn2 = 2. 
+IF (c1a_3 = 1) pn3 = 2. 
+IF (c1a_4 = 1) pn4 = 2. 
+IF (c1a_5 = 1) pn5 = 2. 
+IF (c1a_6 = 1) pn6 = 2. 
+IF (c1a_7 = 1) pn7 = 2. 
+ 
+IF (c1a_1 = 2) pn1 = 2. 
+IF (c1a_2 = 2) pn2 = 2. 
+IF (c1a_3 = 2) pn3 = 2. 
+IF (c1a_4 = 2) pn4 = 2. 
+IF (c1a_5 = 2) pn5 = 2. 
+IF (c1a_6 = 2) pn6 = 2. 
+IF (c1a_7 = 2) pn7 = 2. 
+ 
+IF (c1a_1 = 3) pn1 = 1. 
+IF (c1a_2 = 3) pn2 = 1. 
+IF (c1a_3 = 3) pn3 = 1. 
+IF (c1a_4 = 3) pn4 = 1. 
+IF (c1a_5 = 3) pn5 = 1.
+IF (c1a_6 = 3) pn6 = 1. 
+IF (c1a_7 = 3) pn7 = 1. 
+
+recode pn1 to pn7 (1=1) (2=2) (SYSMIS = 1).
+frequencies pn1 to pn7.
+
+*Computing unmet need
+
+IF (partiallymet1 = 2) | (notmet1 = 2) unmetneed1 = 1.
+IF (partiallymet2 = 2) | (notmet2 = 2) unmetneed2 = 1.
+IF (partiallymet3 = 2) | (notmet3 = 2) unmetneed3 = 1.
+IF (partiallymet4 = 2) | (notmet4 = 2) unmetneed4 = 1.
+IF (partiallymet5 = 2) | (notmet5 = 2) unmetneed5 = 1.
+IF (partiallymet6 = 2) | (notmet6 = 2) unmetneed6 = 1.
+IF (partiallymet7 = 2) | (notmet7 = 2) unmetneed7 = 1.
+
+
+recode unmetneed1 to unmetneed7 (1=1) (SYSMIS=0).
+frequencies unmetneed1 to unmetneed7.
+recode unmetneed1 to unmetneed7 (0=1) (1=2).
+frequencies unmetneed1 to unmetneed7.
+
+*Computing received services
+
+IF (partiallymet1 = 2) | (met1 = 2) served1 = 1.
+IF (partiallymet2 = 2) | (met2 = 2) served2 = 1.
+IF (partiallymet3 = 2) | (met3 = 2) served3 = 1.
+IF (partiallymet4 = 2) | (met4 = 2) served4 = 1.
+IF (partiallymet5 = 2) | (met5 = 2) served5 = 1.
+IF (partiallymet6 = 2) | (met6 = 2) served6 = 1.
+IF (partiallymet7 = 2) | (met7 = 2) served7 = 1.
+
+frequencies served1 to served7.
+
+recode served1 to served7 (1=1) (SYSMIS=0).
+frequencies served1 to served7.
+recode served1 to served7 (0=1) (1=2).
+frequencies served1 to served7.
+
+*Computing total any percevied need unmet need received services
+
+COMPUTE perceivedneed_total = mean.1(pn1 to pn7) > 1.
+COMPUTE unmetneed_total = mean.1(unmetneed1 to unmetneed7) > 1.
+COMPUTE received_services_total = mean.1(served1 to served7) > 1.
+
